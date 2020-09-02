@@ -16,7 +16,7 @@ export default function(
   };
 
   const defaultDomainConfig = {
-    domain: location && location.host,
+    id: "",
     token: undefined,
   }
 
