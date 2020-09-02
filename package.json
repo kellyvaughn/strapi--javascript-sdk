@@ -1,5 +1,5 @@
 {
-  "name": "@taproom/strapi-sdk-javascript",
+  "name": "@thetaproom/strapi-sdk-javascript",
   "version": "0.3.4",
   "description": "The Taproom flavored version of the no longer maintained Strapi SDK for JavaScript",
   "main": "build/main/index.js",
