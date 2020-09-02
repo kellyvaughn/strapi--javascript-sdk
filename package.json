@@ -1,15 +1,14 @@
 {
   "name": "@taproom/strapi-sdk-javascript",
   "version": "0.3.3",
-  "description": "The official Strapi SDK for JavaScript",
+  "description": "The Taproom flavored version of the no longer maintained Strapi SDK for JavaScript",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
   "module": "build/module/index.js",
-  "repository": "https://github.com/strapi/strapi-sdk-javascript",
+  "repository": "https://github.com/thetaproom/strapi-sdk-javascript",
   "license": "MIT",
   "keywords": [],
   "scripts": {
-    "info": "npm-scripts-info",
     "build": "run-s clean && run-p build:*",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
@@ -18,46 +17,18 @@
     "fix:tslint": "tslint --fix --project .",
     "test": "run-s build test:*",
     "test:lint": "tslint --project . && prettier \"src/**/*.ts\" --list-different",
-    "test:unit": "nyc --silent ava",
-    "test:nsp": "nsp check",
-    "watch": "run-s clean build:main && run-p \"build:main -- -w\" \"test:unit -- --watch\"",
-    "cov": "run-s build test:unit cov:html && opn coverage/index.html",
-    "cov:html": "nyc report --reporter=html",
-    "cov:send": "nyc report --reporter=lcov > coverage.lcov && codecov",
-    "cov:check": "nyc report && nyc check-coverage --lines 100 --functions 100 --branches 100",
-    "doc": "run-s doc:html && opn build/docs/index.html",
-    "doc:html": "typedoc src/ --target ES6 --mode file --out build/docs --exclude **/*.spec.ts",
-    "doc:json": "typedoc src/ --target ES6 --mode file --json build/docs/typedoc.json --exclude **/*.spec.ts",
-    "doc:publish": "gh-pages -m \"[ci skip] Updates\" -d build/docs",
-    "version": "standard-version",
-    "reset": "git clean -dfx && git reset --hard && npm i",
-    "clean": "trash build test",
-    "all": "run-s reset test cov:check doc:html",
-    "prepare-release": "run-s all version doc:publish"
-  },
-  "scripts-info": {
-    "info": "Display information about the package scripts",
-    "build": "Clean and rebuild the project",
-    "fix": "Try to automatically fix any linting problems",
-    "test": "Lint and unit test the project",
-    "watch": "Watch and rebuild the project on save, then rerun relevant tests",
-    "cov": "Rebuild, run tests, then create and open the coverage report",
-    "doc": "Generate HTML API documentation and open it in a browser",
-    "doc:json": "Generate API documentation in typedoc JSON format",
-    "changelog": "Bump package.json version, update CHANGELOG.md, tag release",
-    "reset": "Delete all untracked files and reset the repo to the last commit",
-    "prepare-release": "One-step: clean, build, test, publish docs, and prep a release"
+    "test:unit": "nyc --silent ava"
   },
   "engines": {
-    "node": ">=8.9"
+    "node": ">=12.*.*"
   },
   "dependencies": {
+    "@thetaproom/simple-cache": "^1.0.12",
     "axios": "^0.18.0",
     "js-cookie": "^2.2.0",
     "qs": "^6.5.2"
   },
   "devDependencies": {
-    "@types/form-data": "^2.2.1",
     "@types/js-cookie": "^2.2.0",
     "@types/qs": "^6.5.1",
     "@types/sinon": "^5.0.5",
@@ -66,7 +37,6 @@
     "codecov": "^3.1.0",
     "cz-conventional-changelog": "^2.1.0",
     "form-data": "^2.3.3",
-    "gh-pages": "^2.0.0",
     "npm-run-all": "^4.1.3",
     "npm-scripts-info": "^0.3.9",
     "nsp": "^3.2.1",
@@ -75,7 +45,6 @@
     "prettier": "^1.15.2",
     "sinon": "^7.1.1",
     "standard-version": "^4.4.0",
-    "trash-cli": "^1.4.0",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.16.0",
     "typedoc": "^0.13.0",

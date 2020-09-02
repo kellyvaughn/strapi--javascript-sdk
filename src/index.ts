@@ -1,2 +1,2 @@
-import Strapi from './lib/sdk';
-export default Strapi;
+import Provider from './lib/provider';
+export default Provider;

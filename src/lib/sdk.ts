@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
-import * as Cookies from 'js-cookie';
 import * as qs from 'qs';
 
 export interface Authentication {
@@ -8,6 +7,7 @@ export interface Authentication {
 }
 
 export type Provider = 'facebook' | 'google' | 'github' | 'twitter';
+export type TimeUnits = 'minutes' | 'hours' | 'days';
 
 export interface ProviderToken {
   access_token?: string;
@@ -15,23 +15,47 @@ export interface ProviderToken {
   oauth_token?: string;
 }
 
+export interface DomainSettings {
+  domain: string;
+  token: string | undefined;
+}
+
+export interface CacherConfig {
+  storage?: StorageLike;
+  expiration?: ExpirationSettings;
+  archiveIfExpired?: boolean;
+  key: string;
+}
+
+export interface ExpirationSettings {
+  unit?: TimeUnits;
+  amount?: number;
+  neverExpire?: boolean;
+}
+
 export interface CookieConfig {
   key: string;
   options: object;
 }
 
-export interface LocalStorageConfig {
-  key: string;
+export interface StorageExpirationConfig {
+  amount: number;
+  unit: string;
 }
 
-export interface StoreConfig {
-  cookie?: CookieConfig | false;
-  localStorage?: LocalStorageConfig | false;
+export interface StorageLike {
+  clear(): void;
+  getItem(key: string): string | null;
+  removeItem(key: string, expiration?: ExpirationSettings): void;
+  setItem(key: string, value: string): void;
+  [name: string]: any;
 }
 
 export default class Strapi {
   public axios: AxiosInstance;
-  public storeConfig: StoreConfig;
+  public cacher: StorageLike;
+  private cacherTokenKey: string = "jwt";
+  private domainSettings: DomainSettings;
 
   /**
    * Default constructor.
@@ -40,39 +64,23 @@ export default class Strapi {
    */
   constructor(
     baseURL: string,
-    storeConfig?: StoreConfig,
-    requestConfig?: AxiosRequestConfig
+    cacher: StorageLike,
+    domainSettings: DomainSettings,
+    requestConfig?: AxiosRequestConfig,
   ) {
     this.axios = axios.create({
       baseURL,
       paramsSerializer: qs.stringify,
       ...requestConfig
     });
-    this.storeConfig = {
-      cookie: {
-        key: 'jwt',
-        options: {
-          path: '/'
-        }
-      },
-      localStorage: {
-        key: 'jwt'
-      },
-      ...storeConfig
-    };
 
-    if (this.isBrowser()) {
-      let existingToken;
-      if (this.storeConfig.cookie) {
-        existingToken = Cookies.get(this.storeConfig.cookie.key);
-      } else if (this.storeConfig.localStorage) {
-        existingToken = JSON.parse(window.localStorage.getItem(
-          this.storeConfig.localStorage.key
-        ) as string);
-      }
-      if (existingToken) {
-        this.setToken(existingToken, true);
-      }
+    this.cacher = cacher;
+    this.domainSettings = domainSettings;
+
+    const existingToken = this.cacher.getItem(this.cacherTokenKey);
+
+    if (existingToken && this.isBrowser()) {
+      this.setToken(existingToken, true);
     }
   }
 
@@ -88,6 +96,15 @@ export default class Strapi {
     requestConfig?: AxiosRequestConfig
   ): Promise<any> {
     try {
+      if (
+        this.isBrowser()
+        && !this.cacher.getItem(this.cacherTokenKey)
+        && this.domainSettings
+        && this.domainSettings.token !== undefined
+      ) {
+        await this.login(this.domainSettings.domain, this.domainSettings.token)
+      }
+
       const response: AxiosResponse = await this.axios.request({
         method,
         url,
@@ -374,20 +391,11 @@ export default class Strapi {
    */
   public setToken(token: string, comesFromStorage?: boolean): void {
     this.axios.defaults.headers.common.Authorization = 'Bearer ' + token;
-    if (this.isBrowser() && !comesFromStorage) {
-      if (this.storeConfig.localStorage) {
-        window.localStorage.setItem(
-          this.storeConfig.localStorage.key,
-          JSON.stringify(token)
-        );
-      }
-      if (this.storeConfig.cookie) {
-        Cookies.set(
-          this.storeConfig.cookie.key,
-          token,
-          this.storeConfig.cookie.options
-        );
-      }
+    if (this.isBrowser() && !comesFromStorage && this.cacher) {
+      this.cacher.setItem(
+        this.cacherTokenKey,
+        JSON.stringify(token)
+      );
     }
   }
 
@@ -397,14 +405,8 @@ export default class Strapi {
   public clearToken(): void {
     delete this.axios.defaults.headers.common.Authorization;
     if (this.isBrowser()) {
-      if (this.storeConfig.localStorage) {
-        window.localStorage.removeItem(this.storeConfig.localStorage.key);
-      }
-      if (this.storeConfig.cookie) {
-        Cookies.remove(
-          this.storeConfig.cookie.key,
-          this.storeConfig.cookie.options
-        );
+      if (this.cacher) {
+        this.cacher.removeItem(this.cacherTokenKey);
       }
     }
   }
