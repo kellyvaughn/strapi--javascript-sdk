@@ -1,4 +1,7 @@
 {
+  "rules": {
+    "member-ordering": false
+  },
   "compilerOptions": {
     "target": "es2017",
     "outDir": "build/main",
