@@ -391,13 +391,11 @@ export default class Strapi {
    */
   public setToken(token: string, comesFromStorage?: boolean): void {
     this.axios.defaults.headers.common.Authorization = 'Bearer ' + token;
-    if (this.isBrowser() && !comesFromStorage) {
-      if (this.cacher.localStorage) {
-        window.localStorage.setItem(
-          this.cacherTokenKey,
-          JSON.stringify(token)
-        );
-      }
+    if (this.isBrowser() && !comesFromStorage && this.cacher) {
+      this.cacher.setItem(
+        this.cacherTokenKey,
+        JSON.stringify(token)
+      );
     }
   }
 
@@ -407,8 +405,8 @@ export default class Strapi {
   public clearToken(): void {
     delete this.axios.defaults.headers.common.Authorization;
     if (this.isBrowser()) {
-      if (this.cacher.localStorage) {
-        window.localStorage.removeItem(this.cacherTokenKey);
+      if (this.cacher) {
+        this.cacher.removeItem(this.cacherTokenKey);
       }
     }
   }
