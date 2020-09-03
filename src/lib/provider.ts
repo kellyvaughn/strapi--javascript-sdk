@@ -4,7 +4,7 @@ import Strapi, { CacherConfig, DomainSettings, StorageLike } from "./sdk";
 export default function(
   baseURL: string,
   cacherConfig: CacherConfig,
-  domainConfig?: DomainSettings
+  domainConfig: DomainSettings
 ) {
   const defaultConfig = {
     expiration: {
@@ -13,16 +13,6 @@ export default function(
     },
     key: 'customer-portal-settings',
     storage: localStorage,
-  };
-
-  const defaultDomainConfig = {
-    id: "",
-    token: undefined,
-  }
-
-  domainConfig = {
-    ...domainConfig,
-    ...defaultDomainConfig
   };
 
   const config = {...cacherConfig, ...defaultConfig, };
