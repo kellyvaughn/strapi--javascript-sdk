@@ -16,6 +16,6 @@ export default function(
   };
 
   const config = {...cacherConfig, ...defaultConfig, };
-  const storeConfig: StorageLike = new SimpleCache(config);
+  const storeConfig: StorageLike = SimpleCache.getCache(config);;
   return new Strapi(baseURL, storeConfig, domainConfig);
 }
