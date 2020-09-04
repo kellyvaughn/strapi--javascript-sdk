@@ -1,1 +1,0 @@
-declare module '@thetaproom/simple-cache';

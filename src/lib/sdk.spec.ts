@@ -3,7 +3,6 @@
  * @date 09/02/2020
  * @todo COME BACK AND FIX ava window not defined in simple cahe package errors. Ran out of time before release
  */
-import * as SimpleCache from '@thetaproom/simple-cache';
 import anyTest, { TestInterface } from 'ava';
 import browserEnv from 'browser-env';
 import * as sinon from 'sinon';
@@ -20,7 +19,7 @@ const defaultDomainConfig = {
 }
 
 test.beforeEach(t => {
-  const strapi = new Strapi('http://strapi-host', storageMock(), defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
   t.context = {
     axiosRequest: sinon.stub(strapi.axios, 'request').resolves({
       data: {}
@@ -71,15 +70,7 @@ test.serial('Create an instance with existing token on localStorage', t => {
   globalAny.window.localStorage = storageMock();
   const setItem = sinon.spy(globalAny.window.localStorage, 'setItem');
   globalAny.window.localStorage.setItem('jwt', '"XXX"');
-  const simpleCache = new SimpleCache({
-    expiration: {
-      amount: 15,
-      unit: 'minutes'
-    },
-    key: 'customer-portal-settings',
-    storage: storageMock()
-  });
-  const strapi = new Strapi('http://strapi-host', simpleCache, defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
 
   t.is(strapi.axios.defaults.headers.common.Authorization, 'Bearer XXX');
   t.true(setItem.calledWith('jwt', '"XXX"'));
@@ -90,16 +81,7 @@ test.serial('Create an instance with existing token on localStorage', t => {
 test.serial('Create an instance without token', t => {
   browserEnv(['window']);
   const globalAny: any = global;
-
-  const simpleCache = new SimpleCache({
-    expiration: {
-      amount: 15,
-      unit: 'minutes'
-    },
-    key: 'customer-portal-settings',
-    storage: storageMock()
-  });
-  const strapi = new Strapi('http://strapi-host', simpleCache, defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
 
   t.is(strapi.axios.defaults.headers.common.Authorization, undefined);
   delete globalAny.window;
@@ -231,7 +213,7 @@ test.serial('Set Authorization header on axios', async t => {
     }
   });
   const authentication = await t.context.strapi.login('identifier', 'password');
-
+  // @ts-ignore
   t.true(setToken.calledWithExactly(authentication.jwt));
   t.is(
     t.context.strapi.axios.defaults.headers.common.Authorization,
@@ -515,15 +497,7 @@ test('Set token on Node.js', t => {
   globalAny.window.localStorage = storageMock();
   const setItem = sinon.spy(globalAny.window.localStorage, 'setItem');
   // const CookieSet = sinon.spy(Cookies, 'set')
-  const simpleCache = new SimpleCache({
-    expiration: {
-      amount: 15,
-      unit: 'minutes'
-    },
-    key: 'customer-portal-settings',
-    storage: storageMock()
-  });
-  const strapi = new Strapi('http://strapi-host', simpleCache, defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
   strapi.setToken('XXX');
 
   t.is(strapi.axios.defaults.headers.common.Authorization, 'Bearer XXX');
@@ -537,15 +511,7 @@ test('Clear token without storage', t => {
   const globalAny: any = global;
   globalAny.window.localStorage = storageMock();
   const setItem = sinon.spy(globalAny.window.localStorage, 'setItem');
-  const simpleCache = new SimpleCache({
-    expiration: {
-      amount: 15,
-      unit: 'minutes'
-    },
-    key: 'customer-portal-settings',
-    storage: storageMock()
-  });
-  const strapi = new Strapi('http://strapi-host', simpleCache, defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
   strapi.axios.defaults.headers.common.Authorization = 'Bearer XXX';
   strapi.clearToken();
   t.true(setItem.notCalled);

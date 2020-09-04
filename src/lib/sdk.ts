@@ -46,8 +46,8 @@ export default class Strapi {
    */
   constructor(
     baseURL: string,
-    storeConfig?: StoreConfig,
     domainSettings: DomainSettings,
+    storeConfig?: StoreConfig,
     requestConfig?: AxiosRequestConfig
   ) {
     this.domainSettings = domainSettings;
