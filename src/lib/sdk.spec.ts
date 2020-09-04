@@ -14,8 +14,8 @@ const test = anyTest as TestInterface<{
 }>;
 
 const defaultDomainConfig = {
-  domain: location && location.host,
-  token: undefined,
+  domain: "reader_user",
+  token: "password",
 }
 
 test.beforeEach(t => {
