@@ -26,7 +26,6 @@
     "node": ">=12.*.*"
   },
   "dependencies": {
-    "@thetaproom/simple-cache": "^1.0.12",
     "axios": "^0.18.0",
     "js-cookie": "^2.2.0",
     "qs": "^6.5.2"
