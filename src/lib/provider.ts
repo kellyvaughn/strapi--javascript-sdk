@@ -5,5 +5,5 @@ export default function(
   domainConfig: DomainSettings,
   storeConfig?: StoreConfig,
 ) {
-  return new Strapi(baseURL, storeConfig, domainConfig);
+  return new Strapi(baseURL, domainConfig, storeConfig);
 }
