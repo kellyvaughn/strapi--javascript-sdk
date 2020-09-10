@@ -13,13 +13,8 @@ const test = anyTest as TestInterface<{
   axiosRequest: sinon.SinonStub;
 }>;
 
-const defaultDomainConfig = {
-  domain: "reader_user",
-  token: "password",
-}
-
 test.beforeEach(t => {
-  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host');
   t.context = {
     axiosRequest: sinon.stub(strapi.axios, 'request').resolves({
       data: {}
@@ -70,7 +65,7 @@ test.serial('Create an instance with existing token on localStorage', t => {
   globalAny.window.localStorage = storageMock();
   const setItem = sinon.spy(globalAny.window.localStorage, 'setItem');
   globalAny.window.localStorage.setItem('jwt', '"XXX"');
-  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host');
 
   t.is(strapi.axios.defaults.headers.common.Authorization, 'Bearer XXX');
   t.true(setItem.calledWith('jwt', '"XXX"'));
@@ -81,7 +76,7 @@ test.serial('Create an instance with existing token on localStorage', t => {
 test.serial('Create an instance without token', t => {
   browserEnv(['window']);
   const globalAny: any = global;
-  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host');
 
   t.is(strapi.axios.defaults.headers.common.Authorization, undefined);
   delete globalAny.window;
@@ -497,7 +492,7 @@ test('Set token on Node.js', t => {
   globalAny.window.localStorage = storageMock();
   const setItem = sinon.spy(globalAny.window.localStorage, 'setItem');
   // const CookieSet = sinon.spy(Cookies, 'set')
-  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host');
   strapi.setToken('XXX');
 
   t.is(strapi.axios.defaults.headers.common.Authorization, 'Bearer XXX');
@@ -511,7 +506,7 @@ test('Clear token without storage', t => {
   const globalAny: any = global;
   globalAny.window.localStorage = storageMock();
   const setItem = sinon.spy(globalAny.window.localStorage, 'setItem');
-  const strapi = new Strapi('http://strapi-host', defaultDomainConfig);
+  const strapi = new Strapi('http://strapi-host');
   strapi.axios.defaults.headers.common.Authorization = 'Bearer XXX';
   strapi.clearToken();
   t.true(setItem.notCalled);

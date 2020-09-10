@@ -7,11 +7,6 @@ export interface Authentication {
   jwt: string;
 }
 
-export interface DomainSettings {
-  domain: string;
-  token: string | undefined;
-}
-
 export type Provider = 'facebook' | 'google' | 'github' | 'twitter';
 
 export interface ProviderToken {
@@ -37,7 +32,6 @@ export interface StoreConfig {
 export default class Strapi {
   public axios: AxiosInstance;
   public storeConfig: StoreConfig;
-  private domainSettings: DomainSettings;
 
   /**
    * Default constructor.
@@ -46,11 +40,9 @@ export default class Strapi {
    */
   constructor(
     baseURL: string,
-    domainSettings: DomainSettings,
     storeConfig?: StoreConfig,
     requestConfig?: AxiosRequestConfig
   ) {
-    this.domainSettings = domainSettings;
     this.axios = axios.create({
       baseURL,
       paramsSerializer: qs.stringify,
@@ -96,15 +88,6 @@ export default class Strapi {
     requestConfig?: AxiosRequestConfig
   ): Promise<any> {
     try {
-      if (
-        this.isBrowser()
-        && typeof this.getToken() === undefined || typeof this.getToken() === null
-        && this.domainSettings
-        && this.domainSettings.token !== undefined
-      ) {
-        await this.login(this.domainSettings.domain, this.domainSettings.token)
-      }
-
       const response: AxiosResponse = await this.axios.request({
         method,
         url,
